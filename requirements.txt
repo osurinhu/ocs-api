@@ -1,0 +1,7 @@
+dynaconf
+Flask
+flask-cors
+Flask-SQLAlchemy
+mysql-connector-python
+sqlalchemy-serializer
+WTForms

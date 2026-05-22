@@ -1,0 +1,15 @@
+[default]
+TITLE = 'apiocs'
+SECRET_KEY = 'https://www.youtube.com/watch?v=X18av7mN7Rw'
+PREFERRED_URL_SCHEME = "http"
+
+SQLALCHEMY_DATABASE_URI = "mysql+mysqlconnector://ocs:ocsproject@127.0.0.1:3333/ocsweb"
+
+BABEL_DEFAULT_LOCALE = 'pt'
+
+
+EXTENSOES = [
+    "ext.config",
+    "ext.database",
+    
+]
