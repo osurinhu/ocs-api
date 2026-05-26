@@ -9,7 +9,8 @@ def load_extensions(app):
         modulo = import_module(extensao)
         modulo.init_app(app)
 
-def load_routes(app, api):
-    for route in app.config.get(api.title+api.version):
+def load_routes(app, api, blp):
+    for route in app.config.get(api.spec.title+api.spec.version):
         module = import_module(route)
-        api.add_namespace(module.ns)
+        blp.register_blueprint(module.blp)
+    api.register_blueprint(blp)

@@ -1,16 +1,15 @@
+from ext.database import db
+
 from typing import Optional
 import datetime
 import decimal
 
-from sqlalchemy import DECIMAL, Date, DateTime, Double, ForeignKeyConstraint, Index, LargeBinary, String, TIMESTAMP, Text, text
+from sqlalchemy import DECIMAL, Date, DateTime, Double, ForeignKey, ForeignKeyConstraint, Index, LargeBinary, String, TIMESTAMP, Text, text
 from sqlalchemy.dialects.mysql import BIGINT, DOUBLE, INTEGER, LONGBLOB, LONGTEXT, SMALLINT, TINYINT, VARCHAR
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
-
-class Base(DeclarativeBase):
-    pass
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 
-class Accesslog(Base):
+class Accesslog(db.Model):
     __tablename__ = 'accesslog'
     __table_args__ = (
         Index('HARDWARE_ID', 'HARDWARE_ID'),
@@ -24,7 +23,7 @@ class Accesslog(Base):
     PROCESSES: Mapped[Optional[str]] = mapped_column(Text)
 
 
-class Accountinfo(Base):
+class Accountinfo(db.Model):
     __tablename__ = 'accountinfo'
     __table_args__ = (
         Index('TAG', 'TAG'),
@@ -34,7 +33,7 @@ class Accountinfo(Base):
     TAG: Mapped[Optional[str]] = mapped_column(String(255), server_default=text("'NA'"))
 
 
-class AccountinfoConfig(Base):
+class AccountinfoConfig(db.Model):
     __tablename__ = 'accountinfo_config'
 
     ID: Mapped[int] = mapped_column(INTEGER(11), primary_key=True)
@@ -48,7 +47,7 @@ class AccountinfoConfig(Base):
     DEFAULT_VALUE: Mapped[Optional[str]] = mapped_column(String(255))
 
 
-class AssetsCategories(Base):
+class AssetsCategories(db.Model):
     __tablename__ = 'assets_categories'
 
     ID: Mapped[int] = mapped_column(INTEGER(11), primary_key=True)
@@ -58,7 +57,7 @@ class AssetsCategories(Base):
     SQL_ARGS: Mapped[str] = mapped_column(Text, nullable=False)
 
 
-class AuthAttempt(Base):
+class AuthAttempt(db.Model):
     __tablename__ = 'auth_attempt'
 
     ID: Mapped[int] = mapped_column(INTEGER(11), primary_key=True)
@@ -68,7 +67,7 @@ class AuthAttempt(Base):
     SUCCESS: Mapped[Optional[int]] = mapped_column(INTEGER(11))
 
 
-class Batteries(Base):
+class Batteries(db.Model):
     __tablename__ = 'batteries'
     __table_args__ = (
         Index('HARDWARE_ID', 'HARDWARE_ID'),
@@ -91,14 +90,14 @@ class Batteries(Base):
     OEMSPECIFIC: Mapped[Optional[str]] = mapped_column(String(255))
 
 
-class Bios(Base):
+class Bios(db.Model):
     __tablename__ = 'bios'
     __table_args__ = (
         Index('ASSETTAG', 'ASSETTAG'),
         Index('SSN', 'SSN')
     )
 
-    HARDWARE_ID: Mapped[int] = mapped_column(INTEGER(11), primary_key=True)
+    HARDWARE_ID: Mapped[int] = mapped_column(INTEGER(11), ForeignKey('hardware.ID'), primary_key=True)
     SMANUFACTURER: Mapped[Optional[str]] = mapped_column(String(255))
     SMODEL: Mapped[Optional[str]] = mapped_column(String(255))
     SSN: Mapped[Optional[str]] = mapped_column(String(255))
@@ -112,7 +111,7 @@ class Bios(Base):
     MSN: Mapped[Optional[str]] = mapped_column(String(255))
 
 
-class BlacklistMacaddresses(Base):
+class BlacklistMacaddresses(db.Model):
     __tablename__ = 'blacklist_macaddresses'
     __table_args__ = (
         Index('MACADDRESS', 'MACADDRESS', unique=True),
@@ -122,7 +121,7 @@ class BlacklistMacaddresses(Base):
     MACADDRESS: Mapped[str] = mapped_column(String(255), nullable=False, server_default=text("''"))
 
 
-class BlacklistSerials(Base):
+class BlacklistSerials(db.Model):
     __tablename__ = 'blacklist_serials'
     __table_args__ = (
         Index('SERIAL', 'SERIAL', unique=True),
@@ -132,7 +131,7 @@ class BlacklistSerials(Base):
     SERIAL: Mapped[str] = mapped_column(String(255), nullable=False, server_default=text("''"))
 
 
-class BlacklistSubnet(Base):
+class BlacklistSubnet(db.Model):
     __tablename__ = 'blacklist_subnet'
     __table_args__ = (
         Index('SUBNET', 'SUBNET', 'MASK', unique=True),
@@ -143,7 +142,7 @@ class BlacklistSubnet(Base):
     MASK: Mapped[str] = mapped_column(String(20), nullable=False, server_default=text("''"))
 
 
-class Config(Base):
+class Config(db.Model):
     __tablename__ = 'config'
 
     NAME: Mapped[str] = mapped_column(String(50), primary_key=True)
@@ -152,7 +151,7 @@ class Config(Base):
     COMMENTS: Mapped[Optional[str]] = mapped_column(Text)
 
 
-class ConfigLdap(Base):
+class ConfigLdap(db.Model):
     __tablename__ = 'config_ldap'
 
     NAME: Mapped[str] = mapped_column(String(50), primary_key=True)
@@ -161,14 +160,14 @@ class ConfigLdap(Base):
     COMMENTS: Mapped[Optional[str]] = mapped_column(Text)
 
 
-class Conntrack(Base):
+class Conntrack(db.Model):
     __tablename__ = 'conntrack'
 
     IP: Mapped[str] = mapped_column(String(255), primary_key=True, server_default=text("''"))
     TIMESTAMP_: Mapped[datetime.datetime] = mapped_column('TIMESTAMP', TIMESTAMP, nullable=False, server_default=text('current_timestamp() ON UPDATE current_timestamp()'))
 
 
-class Controllers(Base):
+class Controllers(db.Model):
     __tablename__ = 'controllers'
     __table_args__ = (
         Index('HARDWARE_ID', 'HARDWARE_ID'),
@@ -184,7 +183,7 @@ class Controllers(Base):
     TYPE: Mapped[Optional[str]] = mapped_column(String(255))
 
 
-class Cpus(Base):
+class Cpus(db.Model):
     __tablename__ = 'cpus'
     __table_args__ = (
         Index('HARDWARE_ID', 'HARDWARE_ID'),
@@ -207,7 +206,7 @@ class Cpus(Base):
     SOCKET: Mapped[Optional[str]] = mapped_column(String(255))
 
 
-class CveSearch(Base):
+class CveSearch(db.Model):
     __tablename__ = 'cve_search'
 
     ID: Mapped[int] = mapped_column(INTEGER(11), primary_key=True)
@@ -219,7 +218,7 @@ class CveSearch(Base):
     LINK: Mapped[Optional[str]] = mapped_column(String(255))
 
 
-class CveSearchComputer(Base):
+class CveSearchComputer(db.Model):
     __tablename__ = 'cve_search_computer'
 
     ID: Mapped[int] = mapped_column(INTEGER(11), primary_key=True)
@@ -233,7 +232,7 @@ class CveSearchComputer(Base):
     LINK: Mapped[str] = mapped_column(VARCHAR(255, charset='utf8mb4', collation='utf8mb4_general_ci'), nullable=False)
 
 
-class CveSearchCorrespondance(Base):
+class CveSearchCorrespondance(db.Model):
     __tablename__ = 'cve_search_correspondance'
 
     ID: Mapped[int] = mapped_column(INTEGER(11), primary_key=True)
@@ -242,7 +241,7 @@ class CveSearchCorrespondance(Base):
     NAME_RESULT: Mapped[Optional[str]] = mapped_column(String(255))
 
 
-class CveSearchHistory(Base):
+class CveSearchHistory(db.Model):
     __tablename__ = 'cve_search_history'
 
     ID: Mapped[int] = mapped_column(INTEGER(11), primary_key=True)
@@ -251,7 +250,7 @@ class CveSearchHistory(Base):
     CVE_NB: Mapped[Optional[int]] = mapped_column(INTEGER(11), server_default=text('0'))
 
 
-class DeletedEquiv(Base):
+class DeletedEquiv(db.Model):
     __tablename__ = 'deleted_equiv'
     __table_args__ = (
         Index('DELETED', 'DELETED'),
@@ -263,14 +262,14 @@ class DeletedEquiv(Base):
     EQUIVALENT: Mapped[Optional[str]] = mapped_column(String(255))
 
 
-class Deploy(Base):
+class Deploy(db.Model):
     __tablename__ = 'deploy'
 
     NAME: Mapped[str] = mapped_column(String(255), primary_key=True)
     CONTENT: Mapped[bytes] = mapped_column(LONGBLOB, nullable=False)
 
 
-class Devices(Base):
+class Devices(db.Model):
     __tablename__ = 'devices'
     __table_args__ = (
         Index('HARDWARE_ID', 'HARDWARE_ID'),
@@ -287,27 +286,27 @@ class Devices(Base):
     COMMENTS: Mapped[Optional[str]] = mapped_column(Text)
 
 
-class Devicetype(Base):
+class Devicetype(db.Model):
     __tablename__ = 'devicetype'
 
     ID: Mapped[int] = mapped_column(INTEGER(11), primary_key=True)
     NAME: Mapped[Optional[str]] = mapped_column(String(255))
 
 
-class DicoIgnored(Base):
+class DicoIgnored(db.Model):
     __tablename__ = 'dico_ignored'
 
     EXTRACTED: Mapped[str] = mapped_column(String(255), primary_key=True)
 
 
-class DicoSoft(Base):
+class DicoSoft(db.Model):
     __tablename__ = 'dico_soft'
 
     EXTRACTED: Mapped[str] = mapped_column(String(255), primary_key=True)
     FORMATTED: Mapped[str] = mapped_column(String(255), nullable=False)
 
 
-class DownloadAffectRules(Base):
+class DownloadAffectRules(db.Model):
     __tablename__ = 'download_affect_rules'
 
     ID: Mapped[int] = mapped_column(INTEGER(11), primary_key=True)
@@ -320,7 +319,7 @@ class DownloadAffectRules(Base):
     SERV_VALUE: Mapped[Optional[str]] = mapped_column(String(20))
 
 
-class DownloadAvailable(Base):
+class DownloadAvailable(db.Model):
     __tablename__ = 'download_available'
 
     FILEID: Mapped[str] = mapped_column(String(255), primary_key=True)
@@ -334,7 +333,7 @@ class DownloadAvailable(Base):
     DELETED: Mapped[Optional[int]] = mapped_column(INTEGER(11), server_default=text('0'))
 
 
-class DownloadEnable(Base):
+class DownloadEnable(db.Model):
     __tablename__ = 'download_enable'
     __table_args__ = (
         Index('FILEID', 'FILEID'),
@@ -350,7 +349,7 @@ class DownloadEnable(Base):
     GROUP_ID: Mapped[Optional[int]] = mapped_column(INTEGER(11))
 
 
-class DownloadHistory(Base):
+class DownloadHistory(db.Model):
     __tablename__ = 'download_history'
 
     HARDWARE_ID: Mapped[int] = mapped_column(INTEGER(11), primary_key=True)
@@ -358,7 +357,7 @@ class DownloadHistory(Base):
     PKG_NAME: Mapped[Optional[str]] = mapped_column(String(255))
 
 
-class DownloadServers(Base):
+class DownloadServers(db.Model):
     __tablename__ = 'download_servers'
 
     HARDWARE_ID: Mapped[int] = mapped_column(INTEGER(11), primary_key=True)
@@ -368,7 +367,7 @@ class DownloadServers(Base):
     GROUP_ID: Mapped[int] = mapped_column(INTEGER(11), nullable=False)
 
 
-class DownloadwkConfValues(Base):
+class DownloadwkConfValues(db.Model):
     __tablename__ = 'downloadwk_conf_values'
 
     ID: Mapped[int] = mapped_column(INTEGER(11), primary_key=True)
@@ -377,7 +376,7 @@ class DownloadwkConfValues(Base):
     DEFAULT_FIELD: Mapped[Optional[int]] = mapped_column(INTEGER(11))
 
 
-class DownloadwkFields(Base):
+class DownloadwkFields(db.Model):
     __tablename__ = 'downloadwk_fields'
 
     ID: Mapped[int] = mapped_column(INTEGER(11), primary_key=True)
@@ -392,7 +391,7 @@ class DownloadwkFields(Base):
     LINK_STATUS: Mapped[Optional[int]] = mapped_column(INTEGER(11))
 
 
-class DownloadwkHistory(Base):
+class DownloadwkHistory(db.Model):
     __tablename__ = 'downloadwk_history'
 
     ID: Mapped[int] = mapped_column(INTEGER(11), primary_key=True)
@@ -402,7 +401,7 @@ class DownloadwkHistory(Base):
     ACTION: Mapped[Optional[str]] = mapped_column(LONGTEXT)
 
 
-class DownloadwkPack(Base):
+class DownloadwkPack(db.Model):
     __tablename__ = 'downloadwk_pack'
 
     ID: Mapped[int] = mapped_column(INTEGER(11), primary_key=True)
@@ -421,7 +420,7 @@ class DownloadwkPack(Base):
     fields_10: Mapped[Optional[str]] = mapped_column(String(255))
 
 
-class DownloadwkStatutRequest(Base):
+class DownloadwkStatutRequest(db.Model):
     __tablename__ = 'downloadwk_statut_request'
 
     ID: Mapped[int] = mapped_column(INTEGER(11), primary_key=True)
@@ -430,7 +429,7 @@ class DownloadwkStatutRequest(Base):
     ACTIF: Mapped[Optional[int]] = mapped_column(INTEGER(11))
 
 
-class DownloadwkTabValues(Base):
+class DownloadwkTabValues(db.Model):
     __tablename__ = 'downloadwk_tab_values'
 
     ID: Mapped[int] = mapped_column(INTEGER(11), primary_key=True)
@@ -440,7 +439,7 @@ class DownloadwkTabValues(Base):
     DEFAULT_FIELD: Mapped[Optional[int]] = mapped_column(INTEGER(11))
 
 
-class Drives(Base):
+class Drives(db.Model):
     __tablename__ = 'drives'
     __table_args__ = (
         Index('HARDWARE_ID', 'HARDWARE_ID'),
@@ -458,7 +457,7 @@ class Drives(Base):
     CREATEDATE: Mapped[Optional[datetime.date]] = mapped_column(Date)
 
 
-class EngineMutex(Base):
+class EngineMutex(db.Model):
     __tablename__ = 'engine_mutex'
     __table_args__ = (
         Index('PID', 'PID'),
@@ -469,7 +468,7 @@ class EngineMutex(Base):
     PID: Mapped[Optional[int]] = mapped_column(INTEGER(11))
 
 
-class EnginePersistent(Base):
+class EnginePersistent(db.Model):
     __tablename__ = 'engine_persistent'
     __table_args__ = (
         Index('NAME', 'NAME', unique=True),
@@ -481,7 +480,7 @@ class EnginePersistent(Base):
     TVALUE: Mapped[Optional[str]] = mapped_column(String(255))
 
 
-class Extensions(Base):
+class Extensions(db.Model):
     __tablename__ = 'extensions'
 
     id: Mapped[str] = mapped_column(VARCHAR(255, charset='utf8mb3', collation='utf8mb3_bin'), primary_key=True)
@@ -494,7 +493,7 @@ class Extensions(Base):
     contributor: Mapped[Optional[str]] = mapped_column(VARCHAR(255, charset='utf8mb3', collation='utf8mb3_bin'))
 
 
-class Files(Base):
+class Files(db.Model):
     __tablename__ = 'files'
 
     NAME: Mapped[str] = mapped_column(String(100), primary_key=True)
@@ -503,7 +502,7 @@ class Files(Base):
     CONTENT: Mapped[bytes] = mapped_column(LONGBLOB, nullable=False)
 
 
-class Groups(Base):
+class Groups(db.Model):
     __tablename__ = 'groups'
 
     HARDWARE_ID: Mapped[int] = mapped_column(INTEGER(11), primary_key=True, server_default=text('0'))
@@ -513,7 +512,7 @@ class Groups(Base):
     XMLDEF: Mapped[Optional[str]] = mapped_column(LONGTEXT)
 
 
-class GroupsCache(Base):
+class GroupsCache(db.Model):
     __tablename__ = 'groups_cache'
 
     HARDWARE_ID: Mapped[int] = mapped_column(INTEGER(11), primary_key=True, server_default=text('0'))
@@ -521,7 +520,7 @@ class GroupsCache(Base):
     STATIC: Mapped[Optional[int]] = mapped_column(INTEGER(11), server_default=text('0'))
 
 
-class Hardware(Base):
+class Hardware(db.Model):
     __tablename__ = 'hardware'
     __table_args__ = (
         Index('CHECKSUM', 'CHECKSUM'),
@@ -571,9 +570,9 @@ class Hardware(Base):
     ARCHIVE: Mapped[Optional[int]] = mapped_column(INTEGER(11))
 
     archive: Mapped[list['Archive']] = relationship('Archive', back_populates='hardware')
+    bios : Mapped[Optional['Bios']] = relationship('Bios', primaryjoin='Hardware.ID == Bios.HARDWARE_ID', )
 
-
-class HardwareOsnameCache(Base):
+class HardwareOsnameCache(db.Model):
     __tablename__ = 'hardware_osname_cache'
     __table_args__ = (
         Index('OSNAME', 'OSNAME', unique=True),
@@ -583,7 +582,7 @@ class HardwareOsnameCache(Base):
     OSNAME: Mapped[Optional[str]] = mapped_column(String(255))
 
 
-class History(Base):
+class History(db.Model):
     __tablename__ = 'history'
 
     ID: Mapped[int] = mapped_column(BIGINT(20), primary_key=True)
@@ -593,7 +592,7 @@ class History(Base):
     TARGET: Mapped[str] = mapped_column(String(255), nullable=False)
 
 
-class Inputs(Base):
+class Inputs(db.Model):
     __tablename__ = 'inputs'
     __table_args__ = (
         Index('HARDWARE_ID', 'HARDWARE_ID'),
@@ -609,7 +608,7 @@ class Inputs(Base):
     POINTTYPE: Mapped[Optional[str]] = mapped_column(String(255))
 
 
-class ItmgmtComments(Base):
+class ItmgmtComments(db.Model):
     __tablename__ = 'itmgmt_comments'
     __table_args__ = (
         Index('HARDWARE_ID', 'HARDWARE_ID'),
@@ -624,7 +623,7 @@ class ItmgmtComments(Base):
     VISIBLE: Mapped[Optional[int]] = mapped_column(INTEGER(11))
 
 
-class Javainfo(Base):
+class Javainfo(db.Model):
     __tablename__ = 'javainfo'
 
     HARDWARE_ID: Mapped[int] = mapped_column(INTEGER(11), primary_key=True)
@@ -635,7 +634,7 @@ class Javainfo(Base):
     JAVAHOME: Mapped[Optional[str]] = mapped_column(String(255))
 
 
-class Journallog(Base):
+class Journallog(db.Model):
     __tablename__ = 'journallog'
     __table_args__ = (
         Index('HARDWARE_ID', 'HARDWARE_ID'),
@@ -650,7 +649,7 @@ class Journallog(Base):
     ERRORCODE: Mapped[Optional[int]] = mapped_column(INTEGER(11), server_default=text('0'))
 
 
-class Languages(Base):
+class Languages(db.Model):
     __tablename__ = 'languages'
 
     NAME: Mapped[str] = mapped_column(String(60), primary_key=True)
@@ -658,7 +657,7 @@ class Languages(Base):
     JSON_VALUE: Mapped[Optional[str]] = mapped_column(LONGTEXT)
 
 
-class Layouts(Base):
+class Layouts(db.Model):
     __tablename__ = 'layouts'
 
     ID: Mapped[int] = mapped_column(BIGINT(20), primary_key=True)
@@ -671,7 +670,7 @@ class Layouts(Base):
     GROUP_ID: Mapped[Optional[str]] = mapped_column(String(255))
 
 
-class LocalGroups(Base):
+class LocalGroups(db.Model):
     __tablename__ = 'local_groups'
 
     ID: Mapped[int] = mapped_column(INTEGER(11), primary_key=True)
@@ -681,7 +680,7 @@ class LocalGroups(Base):
     MEMBER: Mapped[Optional[str]] = mapped_column(VARCHAR(255, charset='utf8mb4', collation='utf8mb4_general_ci'))
 
 
-class LocalUsers(Base):
+class LocalUsers(db.Model):
     __tablename__ = 'local_users'
 
     ID: Mapped[int] = mapped_column(INTEGER(11), primary_key=True)
@@ -695,7 +694,7 @@ class LocalUsers(Base):
     MEMBER: Mapped[Optional[str]] = mapped_column(VARCHAR(255, charset='utf8mb4', collation='utf8mb4_general_ci'))
 
 
-class Locks(Base):
+class Locks(db.Model):
     __tablename__ = 'locks'
     __table_args__ = (
         Index('SINCE', 'SINCE'),
@@ -706,7 +705,7 @@ class Locks(Base):
     ID: Mapped[Optional[int]] = mapped_column(INTEGER(11))
 
 
-class Memories(Base):
+class Memories(db.Model):
     __tablename__ = 'memories'
     __table_args__ = (
         Index('HARDWARE_ID', 'HARDWARE_ID'),
@@ -724,7 +723,7 @@ class Memories(Base):
     SERIALNUMBER: Mapped[Optional[str]] = mapped_column(String(255))
 
 
-class Modems(Base):
+class Modems(db.Model):
     __tablename__ = 'modems'
     __table_args__ = (
         Index('HARDWARE_ID', 'HARDWARE_ID'),
@@ -738,7 +737,7 @@ class Modems(Base):
     TYPE: Mapped[Optional[str]] = mapped_column(String(255))
 
 
-class Monitors(Base):
+class Monitors(db.Model):
     __tablename__ = 'monitors'
     __table_args__ = (
         Index('HARDWARE_ID', 'HARDWARE_ID'),
@@ -753,7 +752,7 @@ class Monitors(Base):
     SERIAL: Mapped[Optional[str]] = mapped_column(String(255))
 
 
-class Netmap(Base):
+class Netmap(db.Model):
     __tablename__ = 'netmap'
     __table_args__ = (
         Index('IP', 'IP'),
@@ -770,7 +769,7 @@ class Netmap(Base):
     HARDWARE_ID: Mapped[Optional[int]] = mapped_column(INTEGER(11))
 
 
-class NetworkDevices(Base):
+class NetworkDevices(db.Model):
     __tablename__ = 'network_devices'
     __table_args__ = (
         Index('MACADDR', 'MACADDR'),
@@ -783,7 +782,7 @@ class NetworkDevices(Base):
     USER: Mapped[Optional[str]] = mapped_column(String(255))
 
 
-class Networks(Base):
+class Networks(db.Model):
     __tablename__ = 'networks'
     __table_args__ = (
         Index('HARDWARE_ID', 'HARDWARE_ID'),
@@ -810,7 +809,7 @@ class Networks(Base):
     VIRTUALDEV: Mapped[Optional[int]] = mapped_column(TINYINT(1), server_default=text('0'))
 
 
-class Notification(Base):
+class Notification(db.Model):
     __tablename__ = 'notification'
 
     ID: Mapped[int] = mapped_column(INTEGER(11), primary_key=True)
@@ -820,7 +819,7 @@ class Notification(Base):
     ALTBODY: Mapped[Optional[str]] = mapped_column(Text)
 
 
-class NotificationConfig(Base):
+class NotificationConfig(db.Model):
     __tablename__ = 'notification_config'
 
     ID: Mapped[int] = mapped_column(INTEGER(11), primary_key=True)
@@ -828,7 +827,7 @@ class NotificationConfig(Base):
     TVALUE: Mapped[Optional[str]] = mapped_column(String(255))
 
 
-class Operators(Base):
+class Operators(db.Model):
     __tablename__ = 'operators'
 
     ID: Mapped[str] = mapped_column(String(255), primary_key=True, server_default=text("''"))
@@ -843,7 +842,7 @@ class Operators(Base):
     PASSWORD_VERSION: Mapped[Optional[int]] = mapped_column(INTEGER(11), server_default=text('0'))
 
 
-class Ports(Base):
+class Ports(db.Model):
     __tablename__ = 'ports'
     __table_args__ = (
         Index('HARDWARE_ID', 'HARDWARE_ID'),
@@ -857,7 +856,7 @@ class Ports(Base):
     DESCRIPTION: Mapped[Optional[str]] = mapped_column(String(255))
 
 
-class Printers(Base):
+class Printers(db.Model):
     __tablename__ = 'printers'
     __table_args__ = (
         Index('HARDWARE_ID', 'HARDWARE_ID'),
@@ -877,7 +876,7 @@ class Printers(Base):
     NETWORK: Mapped[Optional[int]] = mapped_column(INTEGER(11))
 
 
-class PrologConntrack(Base):
+class PrologConntrack(db.Model):
     __tablename__ = 'prolog_conntrack'
     __table_args__ = (
         Index('DEVICEID', 'DEVICEID'),
@@ -889,7 +888,7 @@ class PrologConntrack(Base):
     PID: Mapped[Optional[int]] = mapped_column(INTEGER(11))
 
 
-class Regconfig(Base):
+class Regconfig(db.Model):
     __tablename__ = 'regconfig'
     __table_args__ = (
         Index('NAME', 'NAME'),
@@ -902,7 +901,7 @@ class Regconfig(Base):
     REGVALUE: Mapped[Optional[str]] = mapped_column(String(255))
 
 
-class Registry(Base):
+class Registry(db.Model):
     __tablename__ = 'registry'
     __table_args__ = (
         Index('HARDWARE_ID', 'HARDWARE_ID'),
@@ -915,7 +914,7 @@ class Registry(Base):
     REGVALUE: Mapped[Optional[str]] = mapped_column(Text)
 
 
-class RegistryNameCache(Base):
+class RegistryNameCache(db.Model):
     __tablename__ = 'registry_name_cache'
     __table_args__ = (
         Index('NAME', 'NAME', unique=True),
@@ -925,14 +924,14 @@ class RegistryNameCache(Base):
     NAME: Mapped[Optional[str]] = mapped_column(String(255))
 
 
-class RegistryRegvalueCache(Base):
+class RegistryRegvalueCache(db.Model):
     __tablename__ = 'registry_regvalue_cache'
 
     ID: Mapped[int] = mapped_column(INTEGER(11), primary_key=True)
     REGVALUE: Mapped[Optional[str]] = mapped_column(Text)
 
 
-class ReportsNotifications(Base):
+class ReportsNotifications(db.Model):
     __tablename__ = 'reports_notifications'
 
     ID: Mapped[int] = mapped_column(BIGINT(20), primary_key=True)
@@ -946,7 +945,7 @@ class ReportsNotifications(Base):
     LAST_EXEC: Mapped[Optional[datetime.datetime]] = mapped_column(DateTime)
 
 
-class Repository(Base):
+class Repository(db.Model):
     __tablename__ = 'repository'
     __table_args__ = (
         Index('HARDWARE_ID', 'HARDWARE_ID'),
@@ -968,7 +967,7 @@ class Repository(Base):
     UPDATED: Mapped[Optional[str]] = mapped_column(String(255))
 
 
-class Saas(Base):
+class Saas(db.Model):
     __tablename__ = 'saas'
 
     ID: Mapped[int] = mapped_column(INTEGER(11), primary_key=True)
@@ -979,7 +978,7 @@ class Saas(Base):
     TTL: Mapped[int] = mapped_column(INTEGER(11), nullable=False)
 
 
-class SaasExp(Base):
+class SaasExp(db.Model):
     __tablename__ = 'saas_exp'
 
     ID: Mapped[int] = mapped_column(INTEGER(11), primary_key=True)
@@ -987,7 +986,7 @@ class SaasExp(Base):
     DNS_EXP: Mapped[str] = mapped_column(String(255), nullable=False)
 
 
-class SaveQuery(Base):
+class SaveQuery(db.Model):
     __tablename__ = 'save_query'
 
     ID: Mapped[int] = mapped_column(INTEGER(11), primary_key=True)
@@ -999,7 +998,7 @@ class SaveQuery(Base):
     GROUP_ID: Mapped[Optional[str]] = mapped_column(String(255))
 
 
-class ScheduleWol(Base):
+class ScheduleWol(db.Model):
     __tablename__ = 'schedule_wol'
 
     ID: Mapped[int] = mapped_column(INTEGER(11), primary_key=True)
@@ -1007,7 +1006,7 @@ class ScheduleWol(Base):
     WOL_DATE: Mapped[datetime.datetime] = mapped_column(DateTime, nullable=False)
 
 
-class Sim(Base):
+class Sim(db.Model):
     __tablename__ = 'sim'
     __table_args__ = (
         Index('HARDWARE_ID', 'HARDWARE_ID'),
@@ -1023,7 +1022,7 @@ class Sim(Base):
     PHONENUMBER: Mapped[Optional[str]] = mapped_column(String(255))
 
 
-class Slots(Base):
+class Slots(db.Model):
     __tablename__ = 'slots'
     __table_args__ = (
         Index('HARDWARE_ID', 'HARDWARE_ID'),
@@ -1039,7 +1038,7 @@ class Slots(Base):
     PSHARE: Mapped[Optional[int]] = mapped_column(TINYINT(4))
 
 
-class SmartHealth(Base):
+class SmartHealth(db.Model):
     __tablename__ = 'smart_health'
 
     id: Mapped[int] = mapped_column(INTEGER(11), primary_key=True)
@@ -1054,7 +1053,7 @@ class SmartHealth(Base):
     coletado_em: Mapped[Optional[datetime.datetime]] = mapped_column(DateTime)
 
 
-class SnmpAccountinfo(Base):
+class SnmpAccountinfo(db.Model):
     __tablename__ = 'snmp_accountinfo'
     __table_args__ = (
         Index('TAG', 'TAG'),
@@ -1067,7 +1066,7 @@ class SnmpAccountinfo(Base):
     TAG: Mapped[Optional[str]] = mapped_column(String(255), server_default=text("'NA'"))
 
 
-class SnmpCommunities(Base):
+class SnmpCommunities(db.Model):
     __tablename__ = 'snmp_communities'
 
     ID: Mapped[int] = mapped_column(INTEGER(11), primary_key=True)
@@ -1081,7 +1080,7 @@ class SnmpCommunities(Base):
     LEVEL: Mapped[Optional[str]] = mapped_column(String(255))
 
 
-class SnmpConfigs(Base):
+class SnmpConfigs(db.Model):
     __tablename__ = 'snmp_configs'
 
     ID: Mapped[int] = mapped_column(INTEGER(11), primary_key=True)
@@ -1092,7 +1091,7 @@ class SnmpConfigs(Base):
     IPD_RECONCILIATION: Mapped[Optional[str]] = mapped_column(String(255))
 
 
-class SnmpDefault(Base):
+class SnmpDefault(db.Model):
     __tablename__ = 'snmp_default'
     __table_args__ = (
         Index('DefaultName', 'DefaultName', unique=True),
@@ -1107,14 +1106,14 @@ class SnmpDefault(Base):
     DefaultGateway: Mapped[Optional[str]] = mapped_column(String(255))
 
 
-class SnmpLabels(Base):
+class SnmpLabels(db.Model):
     __tablename__ = 'snmp_labels'
 
     ID: Mapped[int] = mapped_column(INTEGER(11), primary_key=True)
     LABEL_NAME: Mapped[str] = mapped_column(String(255), nullable=False)
 
 
-class SnmpMibs(Base):
+class SnmpMibs(db.Model):
     __tablename__ = 'snmp_mibs'
 
     ID: Mapped[int] = mapped_column(INTEGER(11), primary_key=True)
@@ -1125,7 +1124,7 @@ class SnmpMibs(Base):
     PARSER: Mapped[Optional[str]] = mapped_column(String(5))
 
 
-class SnmpTypes(Base):
+class SnmpTypes(db.Model):
     __tablename__ = 'snmp_types'
 
     ID: Mapped[int] = mapped_column(INTEGER(11), primary_key=True)
@@ -1133,7 +1132,7 @@ class SnmpTypes(Base):
     TABLE_TYPE_NAME: Mapped[str] = mapped_column(String(255), nullable=False)
 
 
-class SnmpTypesConditions(Base):
+class SnmpTypesConditions(db.Model):
     __tablename__ = 'snmp_types_conditions'
 
     ID: Mapped[int] = mapped_column(INTEGER(11), primary_key=True)
@@ -1142,7 +1141,7 @@ class SnmpTypesConditions(Base):
     CONDITION_VALUE: Mapped[Optional[str]] = mapped_column(VARCHAR(255, charset='utf8mb4', collation='utf8mb4_general_ci'))
 
 
-class Software(Base):
+class Software(db.Model):
     __tablename__ = 'software'
     __table_args__ = (
         Index('HARDWARE_ID', 'HARDWARE_ID'),
@@ -1169,7 +1168,7 @@ class Software(Base):
     ARCHITECTURE: Mapped[Optional[str]] = mapped_column(String(255))
 
 
-class SoftwareCategories(Base):
+class SoftwareCategories(db.Model):
     __tablename__ = 'software_categories'
 
     ID: Mapped[int] = mapped_column(INTEGER(11), primary_key=True)
@@ -1177,7 +1176,7 @@ class SoftwareCategories(Base):
     OS: Mapped[Optional[str]] = mapped_column(String(255))
 
 
-class SoftwareCategoriesLink(Base):
+class SoftwareCategoriesLink(db.Model):
     __tablename__ = 'software_categories_link'
     __table_args__ = (
         Index('CATEGORY_ID', 'CATEGORY_ID'),
@@ -1193,7 +1192,7 @@ class SoftwareCategoriesLink(Base):
     CATEGORY_ID: Mapped[int] = mapped_column(INTEGER(11), nullable=False)
 
 
-class SoftwareCategoryExp(Base):
+class SoftwareCategoryExp(db.Model):
     __tablename__ = 'software_category_exp'
     __table_args__ = (
         Index('CATEGORY_ID', 'CATEGORY_ID'),
@@ -1207,7 +1206,7 @@ class SoftwareCategoryExp(Base):
     PUBLISHER: Mapped[Optional[str]] = mapped_column(String(255))
 
 
-class SoftwareLink(Base):
+class SoftwareLink(db.Model):
     __tablename__ = 'software_link'
     __table_args__ = (
         Index('NAME_ID', 'NAME_ID'),
@@ -1224,7 +1223,7 @@ class SoftwareLink(Base):
     COUNT: Mapped[Optional[int]] = mapped_column(INTEGER(11))
 
 
-class SoftwareName(Base):
+class SoftwareName(db.Model):
     __tablename__ = 'software_name'
     __table_args__ = (
         Index('NAME', 'NAME', unique=True),
@@ -1234,7 +1233,7 @@ class SoftwareName(Base):
     NAME: Mapped[str] = mapped_column(String(255), nullable=False)
 
 
-class SoftwarePublisher(Base):
+class SoftwarePublisher(db.Model):
     __tablename__ = 'software_publisher'
     __table_args__ = (
         Index('PUBLISHER', 'PUBLISHER', unique=True),
@@ -1244,7 +1243,7 @@ class SoftwarePublisher(Base):
     PUBLISHER: Mapped[str] = mapped_column(String(255), nullable=False)
 
 
-class SoftwareVersion(Base):
+class SoftwareVersion(db.Model):
     __tablename__ = 'software_version'
     __table_args__ = (
         Index('VERSION', 'VERSION', unique=True),
@@ -1259,7 +1258,7 @@ class SoftwareVersion(Base):
     PATCH: Mapped[Optional[int]] = mapped_column(INTEGER(11))
 
 
-class SoftwaresNameCache(Base):
+class SoftwaresNameCache(db.Model):
     __tablename__ = 'softwares_name_cache'
     __table_args__ = (
         Index('NAME', 'NAME', unique=True),
@@ -1269,7 +1268,7 @@ class SoftwaresNameCache(Base):
     NAME: Mapped[Optional[str]] = mapped_column(String(255))
 
 
-class Sounds(Base):
+class Sounds(db.Model):
     __tablename__ = 'sounds'
     __table_args__ = (
         Index('HARDWARE_ID', 'HARDWARE_ID'),
@@ -1282,7 +1281,7 @@ class Sounds(Base):
     DESCRIPTION: Mapped[Optional[str]] = mapped_column(String(255))
 
 
-class SslStore(Base):
+class SslStore(db.Model):
     __tablename__ = 'ssl_store'
 
     ID: Mapped[int] = mapped_column(INTEGER(11), primary_key=True)
@@ -1293,7 +1292,7 @@ class SslStore(Base):
     DESCRIPTION: Mapped[Optional[str]] = mapped_column(String(255))
 
 
-class Storages(Base):
+class Storages(db.Model):
     __tablename__ = 'storages'
     __table_args__ = (
         Index('HARDWARE_ID', 'HARDWARE_ID'),
@@ -1311,7 +1310,7 @@ class Storages(Base):
     FIRMWARE: Mapped[Optional[str]] = mapped_column(String(255))
 
 
-class Subnet(Base):
+class Subnet(db.Model):
     __tablename__ = 'subnet'
     __table_args__ = (
         Index('ID', 'ID'),
@@ -1325,7 +1324,7 @@ class Subnet(Base):
     TAG: Mapped[Optional[str]] = mapped_column(String(255))
 
 
-class Tags(Base):
+class Tags(db.Model):
     __tablename__ = 'tags'
     __table_args__ = (
         Index('Login', 'Login'),
@@ -1336,7 +1335,7 @@ class Tags(Base):
     Login: Mapped[str] = mapped_column(String(100), primary_key=True, server_default=text("''"))
 
 
-class TempFiles(Base):
+class TempFiles(db.Model):
     __tablename__ = 'temp_files'
 
     ID: Mapped[int] = mapped_column(INTEGER(11), primary_key=True)
@@ -1351,7 +1350,7 @@ class TempFiles(Base):
     ID_DDE: Mapped[Optional[int]] = mapped_column(INTEGER(11))
 
 
-class Usbdevices(Base):
+class Usbdevices(db.Model):
     __tablename__ = 'usbdevices'
     __table_args__ = (
         Index('HARDWARE_ID', 'HARDWARE_ID'),
@@ -1366,7 +1365,7 @@ class Usbdevices(Base):
     TYPE: Mapped[Optional[str]] = mapped_column(String(255))
 
 
-class Videos(Base):
+class Videos(db.Model):
     __tablename__ = 'videos'
     __table_args__ = (
         Index('HARDWARE_ID', 'HARDWARE_ID'),
@@ -1380,7 +1379,7 @@ class Videos(Base):
     RESOLUTION: Mapped[Optional[str]] = mapped_column(String(255))
 
 
-class Virtualmachines(Base):
+class Virtualmachines(db.Model):
     __tablename__ = 'virtualmachines'
     __table_args__ = (
         Index('HARDWARE_ID', 'HARDWARE_ID'),
@@ -1397,7 +1396,7 @@ class Virtualmachines(Base):
     MEMORY: Mapped[Optional[int]] = mapped_column(INTEGER(11))
 
 
-class Archive(Base):
+class Archive(db.Model):
     __tablename__ = 'archive'
     __table_args__ = (
         ForeignKeyConstraint(['HARDWARE_ID'], ['hardware.ID'], name='archive_ibfk_1'),

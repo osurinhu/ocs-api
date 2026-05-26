@@ -1,7 +1,8 @@
+dependency-injector
 dynaconf
 Flask
 flask-cors
+flask-smorest
 Flask-SQLAlchemy
-mysql-connector-python
-sqlalchemy-serializer
+pymysql
 WTForms
