@@ -1,6 +1,4 @@
-from dependency_injector.wiring import Provide, inject
-from sqlalchemy import select
-from models.models import Hardware
+from schemas.paginacao_schema import PaginadoOutputModel
 from marshmallow import Schema, fields
 
 class BiosOutputModel(Schema):
@@ -23,12 +21,8 @@ class HardwareOutputModel(Schema):
     ultimo_inventario = fields.DateTime(attribute='LASTDATE')
     bios = fields.Nested(BiosOutputModel)
 
-class MaquinasPaginadoOutputModel(Schema):
-    items = fields.List(fields.Nested(HardwareOutputModel))
-    page = fields.Int()
-    per_page = fields.Int()
-    total = fields.Int()
-    has_next = fields.Bool()
+class MaquinasPaginadoOutputModel(PaginadoOutputModel):
+        items = fields.List(fields.Nested(HardwareOutputModel))
 
 class MaquinasService:
     def __init__(self, maquinas_repository):
@@ -37,8 +31,6 @@ class MaquinasService:
 
 
     def listar(self, per_page:int, page:int):
-        query = (select(Hardware))
-
         result = self.maquinas_repository.listar_paginado(page=page, per_page=per_page)
 
         return MaquinasPaginadoOutputModel().dump(result)

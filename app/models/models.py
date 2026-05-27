@@ -190,7 +190,7 @@ class Cpus(db.Model):
     )
 
     ID: Mapped[int] = mapped_column(INTEGER(11), primary_key=True)
-    HARDWARE_ID: Mapped[int] = mapped_column(INTEGER(11), nullable=False)
+    HARDWARE_ID: Mapped[int] = mapped_column(INTEGER(11), ForeignKey('hardware.ID'), nullable=False)
     MANUFACTURER: Mapped[Optional[str]] = mapped_column(String(255))
     TYPE: Mapped[Optional[str]] = mapped_column(String(255))
     SERIALNUMBER: Mapped[Optional[str]] = mapped_column(String(255))
@@ -204,6 +204,8 @@ class Cpus(db.Model):
     VOLTAGE: Mapped[Optional[str]] = mapped_column(String(255))
     CURRENT_SPEED: Mapped[Optional[str]] = mapped_column(String(255))
     SOCKET: Mapped[Optional[str]] = mapped_column(String(255))
+
+    hardware : Mapped['Hardware'] = relationship('Hardware')
 
 
 class CveSearch(db.Model):
@@ -446,7 +448,7 @@ class Drives(db.Model):
     )
 
     ID: Mapped[int] = mapped_column(INTEGER(11), primary_key=True)
-    HARDWARE_ID: Mapped[int] = mapped_column(INTEGER(11), nullable=False)
+    HARDWARE_ID: Mapped[int] = mapped_column(INTEGER(11), ForeignKey('hardware.ID'), nullable=False)
     LETTER: Mapped[Optional[str]] = mapped_column(String(255))
     TYPE: Mapped[Optional[str]] = mapped_column(String(255))
     FILESYSTEM: Mapped[Optional[str]] = mapped_column(String(255))
@@ -455,6 +457,8 @@ class Drives(db.Model):
     NUMFILES: Mapped[Optional[int]] = mapped_column(INTEGER(11))
     VOLUMN: Mapped[Optional[str]] = mapped_column(String(255))
     CREATEDATE: Mapped[Optional[datetime.date]] = mapped_column(Date)
+    
+    hardware : Mapped['Hardware'] = relationship('Hardware')
 
 
 class EngineMutex(db.Model):
@@ -569,8 +573,8 @@ class Hardware(db.Model):
     CATEGORY_ID: Mapped[Optional[int]] = mapped_column(INTEGER(11))
     ARCHIVE: Mapped[Optional[int]] = mapped_column(INTEGER(11))
 
-    archive: Mapped[list['Archive']] = relationship('Archive', back_populates='hardware')
-    bios : Mapped[Optional['Bios']] = relationship('Bios', primaryjoin='Hardware.ID == Bios.HARDWARE_ID', )
+    archive: Mapped[list['Archive']] = relationship('Archive')
+    bios : Mapped[Optional['Bios']] = relationship('Bios')
 
 class HardwareOsnameCache(db.Model):
     __tablename__ = 'hardware_osname_cache'
@@ -793,7 +797,7 @@ class Networks(db.Model):
     )
 
     ID: Mapped[int] = mapped_column(INTEGER(11), primary_key=True)
-    HARDWARE_ID: Mapped[int] = mapped_column(INTEGER(11), nullable=False)
+    HARDWARE_ID: Mapped[int] = mapped_column(INTEGER(11), ForeignKey('hardware.ID'), nullable=False)
     DESCRIPTION: Mapped[Optional[str]] = mapped_column(String(255))
     TYPE: Mapped[Optional[str]] = mapped_column(String(255))
     TYPEMIB: Mapped[Optional[str]] = mapped_column(String(255))
@@ -807,6 +811,8 @@ class Networks(db.Model):
     IPSUBNET: Mapped[Optional[str]] = mapped_column(String(255))
     IPDHCP: Mapped[Optional[str]] = mapped_column(String(255))
     VIRTUALDEV: Mapped[Optional[int]] = mapped_column(TINYINT(1), server_default=text('0'))
+
+    hardware : Mapped['Hardware'] = relationship('Hardware')
 
 
 class Notification(db.Model):
@@ -1152,10 +1158,10 @@ class Software(db.Model):
     )
 
     ID: Mapped[int] = mapped_column(BIGINT(20), primary_key=True)
-    HARDWARE_ID: Mapped[int] = mapped_column(INTEGER(11), nullable=False)
-    NAME_ID: Mapped[int] = mapped_column(INTEGER(11), nullable=False)
-    PUBLISHER_ID: Mapped[int] = mapped_column(INTEGER(11), nullable=False)
-    VERSION_ID: Mapped[int] = mapped_column(INTEGER(11), nullable=False)
+    HARDWARE_ID: Mapped[int] = mapped_column(INTEGER(11), ForeignKey('hardware.ID'), nullable=False)
+    NAME_ID: Mapped[int] = mapped_column(INTEGER(11), ForeignKey('software_name.ID'), nullable=False)
+    PUBLISHER_ID: Mapped[int] = mapped_column(INTEGER(11), ForeignKey('software_publisher.ID'), nullable=False)
+    VERSION_ID: Mapped[int] = mapped_column(INTEGER(11), ForeignKey('software_version.ID'), nullable=False)
     FOLDER: Mapped[Optional[str]] = mapped_column(Text)
     COMMENTS: Mapped[Optional[str]] = mapped_column(Text)
     FILENAME: Mapped[Optional[str]] = mapped_column(String(255))
@@ -1166,6 +1172,11 @@ class Software(db.Model):
     INSTALLDATE: Mapped[Optional[datetime.datetime]] = mapped_column(DateTime)
     BITSWIDTH: Mapped[Optional[int]] = mapped_column(INTEGER(11))
     ARCHITECTURE: Mapped[Optional[str]] = mapped_column(String(255))
+
+    hardware : Mapped['Hardware'] = relationship('Hardware')
+    software_name : Mapped['SoftwareName'] = relationship('SoftwareName')
+    software_publisher : Mapped['SoftwarePublisher'] = relationship('SoftwarePublisher')
+    software_version : Mapped['SoftwareVersion'] = relationship('SoftwareVersion')
 
 
 class SoftwareCategories(db.Model):
@@ -1231,6 +1242,7 @@ class SoftwareName(db.Model):
 
     ID: Mapped[int] = mapped_column(INTEGER(11), primary_key=True)
     NAME: Mapped[str] = mapped_column(String(255), nullable=False)
+
 
 
 class SoftwarePublisher(db.Model):
