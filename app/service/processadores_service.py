@@ -2,9 +2,10 @@ from marshmallow import Schema, fields
 from schemas.paginacao_schema import PaginadoOutputModel
 
 class ProcessadorOutputModel(Schema):
-    id_computador = fields.Int(attribute='ID')
+    id_computador = fields.Int(attribute='hardware.ID')
     computador = fields.String(attribute='hardware.NAME')
 
+    id = fields.Int(attribute='ID')
     processador = fields.String(attribute='TYPE')
     fabricante = fields.String(attribute='MANUFACTURER')
     mhz = fields.String(attribute='SPEED')

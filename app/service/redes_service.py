@@ -2,9 +2,10 @@ from marshmallow import Schema, fields
 from schemas.paginacao_schema import PaginadoOutputModel
 
 class RedeOutputModel(Schema):
-    id_computador = fields.Int(attribute='ID')
+    id_computador = fields.Int(attribute='hardware.ID')
     computador = fields.String(attribute='hardware.NAME')
 
+    id = fields.Int(attribute='ID')
     ip = fields.String(attribute='IPADDRESS')
     mac = fields.String(attribute='MACADDR')
     interface = fields.String(attribute='DESCRIPTION')
