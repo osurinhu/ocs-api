@@ -1,9 +1,9 @@
 from marshmallow import Schema, fields
+from schemas.referencia_hardware_schema import ReferenciaHardwareSchema
 from schemas.paginacao_schema import PaginadoOutputModel
 
 class DiscoOutputModel(Schema):
-    id_computador = fields.Int(attribute='hardware.ID')
-    computador = fields.String(attribute='hardware.NAME')
+    hardware = fields.Nested(ReferenciaHardwareSchema)
 
     id = fields.Int(attribute='ID')
     volume = fields.String(attribute='VOLUMN')
@@ -12,7 +12,10 @@ class DiscoOutputModel(Schema):
     ocupado_mb = fields.Method('calcular_espaco_ocupado')
 
     def calcular_espaco_ocupado(self, obj):
-        return obj.TOTAL - obj.FREE
+        try:
+            return obj.TOTAL - obj.FREE
+        except:
+             return None
 
 class DiscosPaginadoOutputModel(PaginadoOutputModel):
         items = fields.List(fields.Nested(DiscoOutputModel))

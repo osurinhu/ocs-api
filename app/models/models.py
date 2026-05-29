@@ -603,14 +603,15 @@ class Inputs(db.Model):
     )
 
     ID: Mapped[int] = mapped_column(INTEGER(11), primary_key=True)
-    HARDWARE_ID: Mapped[int] = mapped_column(INTEGER(11), nullable=False)
+    HARDWARE_ID: Mapped[int] = mapped_column(INTEGER(11), ForeignKey('hardware.ID'), nullable=False)
     TYPE: Mapped[Optional[str]] = mapped_column(String(255))
     MANUFACTURER: Mapped[Optional[str]] = mapped_column(String(255))
     CAPTION: Mapped[Optional[str]] = mapped_column(String(255))
     DESCRIPTION: Mapped[Optional[str]] = mapped_column(String(255))
     INTERFACE: Mapped[Optional[str]] = mapped_column(String(255))
     POINTTYPE: Mapped[Optional[str]] = mapped_column(String(255))
-
+    
+    hardware : Mapped['Hardware'] = relationship('Hardware')
 
 class ItmgmtComments(db.Model):
     __tablename__ = 'itmgmt_comments'

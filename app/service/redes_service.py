@@ -1,9 +1,9 @@
 from marshmallow import Schema, fields
+from schemas.referencia_hardware_schema import ReferenciaHardwareSchema
 from schemas.paginacao_schema import PaginadoOutputModel
 
 class RedeOutputModel(Schema):
-    id_computador = fields.Int(attribute='hardware.ID')
-    computador = fields.String(attribute='hardware.NAME')
+    hardware = fields.Nested(ReferenciaHardwareSchema)
 
     id = fields.Int(attribute='ID')
     ip = fields.String(attribute='IPADDRESS')

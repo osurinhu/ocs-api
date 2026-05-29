@@ -9,7 +9,7 @@ class BiosOutputModel(Schema):
 
 class HardwareOutputModel(Schema):
     id = fields.Int(attribute='ID')
-    computador = fields.String(attribute='NAME')
+    nome = fields.String(attribute='NAME')
     ip = fields.String(attribute='IPADDR')
 
     sistema = fields.String(attribute='OSNAME')
