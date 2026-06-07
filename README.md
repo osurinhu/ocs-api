@@ -4,7 +4,7 @@
 - Entre na vpn do chefe
 - Encaminhe a porta 3306 do servidor do banco a porta 3333 do seu pc 
 ```
-ssh -L 127.0.0.1:3333 usuario@ipbanco:3306
+ssh -L 3333:127.0.0.1:3306 ocs@100.127.50.13
 ```
 - Crie o venv
 ```
