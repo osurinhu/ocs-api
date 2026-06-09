@@ -1,0 +1,27 @@
+[default]
+TITLE = 'apiocs'
+SECRET_KEY = 'https://www.youtube.com/watch?v=X18av7mN7Rw'
+
+SQLALCHEMY_DATABASE_URI = "mysql+pymysql://usuario:senha@127.0.0.1:3333/ocsweb"
+
+OPENAPI_URL_PREFIX = '/api/v1'
+OPENAPI_SWAGGER_UI_PATH = ''
+OPENAPI_SWAGGER_UI_URL = 'https://cdn.jsdelivr.net/npm/swagger-ui-dist/'
+
+
+EXTENSOES = [
+    "ext.config",
+    "ext.database",
+    "ext.dependency_injector",
+    "ext.api",
+]
+
+APIV1 = [
+    "blueprint.restapi.v1.maquinas",
+    "blueprint.restapi.v1.softwares",
+    "blueprint.restapi.v1.discos",
+    "blueprint.restapi.v1.redes",
+    "blueprint.restapi.v1.processadores",
+    "blueprint.restapi.v1.monitores",
+    "blueprint.restapi.v1.inputs",
+]
